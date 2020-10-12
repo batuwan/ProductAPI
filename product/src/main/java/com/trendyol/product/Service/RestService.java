@@ -1,17 +1,19 @@
 package com.trendyol.product.Service;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.trendyol.product.Domain.Post;
+import com.trendyol.product.Domain.Product;
+import com.trendyol.product.Domain.Stock;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class RestService {
@@ -50,6 +52,23 @@ public class RestService {
         } else {
             return null;
         }
+    }
+
+    public ResponseEntity<String> createStock(Product product) throws URISyntaxException {
+        String url = "http://localhost:8082/products/" + product.getId() + "/stocks";
+        URI uri = new URI(url);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        Stock stock = Stock.builder()
+                .id(UUID.randomUUID().toString())
+                .quantity(product.getQuantity())
+                .itemId(product.getId())
+                .build();
+
+        return restTemplate.postForEntity(url, stock, String.class);
+
     }
 
     //POST

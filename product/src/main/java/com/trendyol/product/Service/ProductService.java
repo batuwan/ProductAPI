@@ -46,6 +46,15 @@ public class ProductService {
 
         return productPatched;
     }
+
+    public void update(String id, Product product){
+        try{
+            productRepository.updateProduct(id, product);
+        }catch(Exception e){
+            throw new IllegalArgumentException(); // check again
+        }
+    }
+
     private Product applyPatch(JsonPatch patch, Product target) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(target, JsonNode.class));
         return objectMapper.treeToValue(patched, Product.class);
