@@ -64,6 +64,4 @@ public class ProductController {
     public ResponseEntity<Void> updateProductCategory(@RequestParam(name = "category") String userId, @PathVariable String id){
         return ResponseEntity.ok().build();
     }
-
-
 }
