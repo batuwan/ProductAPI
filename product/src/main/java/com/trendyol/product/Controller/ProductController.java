@@ -1,12 +1,10 @@
 package com.trendyol.product.Controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.trendyol.product.Domain.Product;
 import com.trendyol.product.Service.ProductService;
 import com.trendyol.product.Service.RestService;
+import com.trendyol.product.UpdateDTO.ProductUpdateDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,13 +45,6 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping (path = "/{id}", consumes = "application/json-patch+json")
-    public ResponseEntity<Product> updateProduct(@PathVariable ("id") String productId, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-
-        Product product = productService.update(productId, patch);
-        return ResponseEntity.ok(product);
-    }
-
     @PutMapping ("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable ("id") String productId, @RequestBody Product product){
         productService.update(productId, product);
@@ -61,8 +52,30 @@ public class ProductController {
     }
 
     @PatchMapping ("/{id}")
-    public ResponseEntity<Void> updateProductCategory(@RequestParam(name = "category") String userId, @PathVariable String id){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> updateProduct(@PathVariable("id") String productId,
+                                             @RequestBody ProductUpdateDTO productUpdateDTO) {
+        Optional<Product> productOptional = productService.findProductById(productId);
+        if (productOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Product product = productOptional.get();
+        if (productUpdateDTO.getCategory() != null) {
+            product.setCategory(productUpdateDTO.getCategory());
+        }
+        if (productUpdateDTO.getDescription() != null) {
+            product.setDescription(productUpdateDTO.getDescription());
+        }
+        if (productUpdateDTO.getPrice() != null) {
+            product.setPrice(productUpdateDTO.getPrice());
+        }
+        if (productUpdateDTO.getQuantity() != null) {
+            product.setQuantity(productUpdateDTO.getQuantity());
+        }
+
+        productService.save(product);
+
+        return ResponseEntity.noContent().build();
     }
 
 

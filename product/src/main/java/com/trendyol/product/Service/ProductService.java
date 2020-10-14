@@ -23,40 +23,34 @@ public class ProductService {
         this.objectMapper = objectMapper;
     }
 
-    public Product createProduct(Product product){
+    public Product createProduct(Product product) {
         product.setId(UUID.randomUUID().toString());
         return productRepository.createProduct(product);
     }
 
-    public Optional<Product> findProductById(String id){
+    public Optional<Product> findProductById(String id) {
         return productRepository.findProductById(id);
     }
 
-    public void deleteProduct(String id){
+    public void deleteProduct(String id) {
         productRepository.deleteProduct(id);
     }
 
-    public Product update(String id, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        Optional<Product> product = productRepository.findProductById(id);
-        if(product.isEmpty()) throw new RuntimeException();
-
-        Product productPatched = applyPatch(patch, product.get());
-
-        productRepository.updateProduct(productPatched.getId(), productPatched);
-
-        return productPatched;
-    }
-
-    public void update(String id, Product product){
-        try{
+    public void update(String id, Product product) {
+        try {
             productRepository.updateProduct(id, product);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException(); // check again
         }
     }
 
-    private Product applyPatch(JsonPatch patch, Product target) throws JsonPatchException, JsonProcessingException {
-        JsonNode patched = patch.apply(objectMapper.convertValue(target, JsonNode.class));
-        return objectMapper.treeToValue(patched, Product.class);
+    public void save(Product product) {
+        try {
+            productRepository.saveProduct(product);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(); // check again
+        }
     }
+
+
 }

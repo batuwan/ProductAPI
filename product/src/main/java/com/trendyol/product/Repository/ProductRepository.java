@@ -46,5 +46,16 @@ public class ProductRepository {
     public void updateProduct(String id, Product product) {
         productCollection.replace(id, product);
     }
+
+    public void saveProduct(Product product){
+        if (product == null){
+            throw new IllegalArgumentException("Product can't be null");
+        }
+        if (!findProductById(product.getId()).equals(product)) {
+            throw new RuntimeException(String.format("Product with id '%s' does not exists", product.getId()));
+        }
+        productCollection.remove(product.getId());
+        productCollection.insert(product.getId(), product);
+    }
 }
 
