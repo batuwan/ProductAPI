@@ -51,7 +51,8 @@ public class ProductRepository {
         if (product == null){
             throw new IllegalArgumentException("Product can't be null");
         }
-        if (!findProductById(product.getId()).equals(product)) {
+
+        if (findProductById(product.getId()).isEmpty()) {
             throw new RuntimeException(String.format("Product with id '%s' does not exists", product.getId()));
         }
         productCollection.remove(product.getId());
