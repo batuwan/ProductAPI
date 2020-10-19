@@ -5,8 +5,10 @@ import com.trendyol.product.Domain.Product;
 import com.trendyol.product.Service.ProductService;
 import com.trendyol.product.Service.RestService;
 import com.trendyol.product.UpdateDTO.ProductUpdateDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,12 +27,20 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) throws URISyntaxException {
-        Product newProduct = productService.createProduct(product);
-        ResponseEntity<String> response = restService.createStock(product);
-        if(response.getStatusCodeValue() == 201){
-            return ResponseEntity.created(URI.create(newProduct.getId())).build();
+        try {
+            productService.createProduct(product);
+        } catch (RuntimeException ex) {
+            return new ResponseEntity(
+                    "Something went wrong on our side !",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(product.getId())
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/{id}")
