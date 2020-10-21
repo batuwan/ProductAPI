@@ -54,18 +54,13 @@ public class RestService {
         }
     }
 
-    public ResponseEntity<String> createStock(Product product) throws URISyntaxException {
-        String url = "http://localhost:8082/products/" + product.getId() + "/stocks";
+    public ResponseEntity<String> createStock(Stock stock) throws URISyntaxException {
+        String url = "http://localhost:8082/products/" + stock.getItemId() + "/stocks";
         URI uri = new URI(url);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        Stock stock = Stock.builder()
-                .id(UUID.randomUUID().toString())
-                .quantity(product.getQuantity())
-                .itemId(product.getId())
-                .build();
 
         return restTemplate.postForEntity(url, stock, String.class);
 

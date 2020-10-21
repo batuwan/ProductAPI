@@ -8,9 +8,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
 public class Stock {
     private String id;
     private String itemId;
     private int quantity;
+
+    public Stock(){
+        this.id = UUID.randomUUID().toString();
+    }
 }

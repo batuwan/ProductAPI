@@ -2,6 +2,7 @@ package com.trendyol.product.Controller;
 
 
 import com.trendyol.product.Domain.Product;
+import com.trendyol.product.Domain.Stock;
 import com.trendyol.product.Service.ProductService;
 import com.trendyol.product.Service.RestService;
 import com.trendyol.product.UpdateDTO.ProductUpdateDTO;
@@ -29,6 +30,10 @@ public class ProductController {
     public ResponseEntity<Product> createProduct(@RequestBody Product product) throws URISyntaxException {
         try {
             productService.createProduct(product);
+            Stock stock = new Stock();
+            stock.setItemId(product.getId());
+            stock.setQuantity(1); // default
+            restService.createStock(stock);
         } catch (RuntimeException ex) {
             return new ResponseEntity(
                     "Something went wrong on our side !",
