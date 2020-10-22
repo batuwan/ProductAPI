@@ -49,26 +49,40 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Product>> findProductById(@PathVariable ("id") String id) {
-        Optional<Product> product = productService.findProductById(id);
-        return ResponseEntity.ok().body(product);
+    public ResponseEntity<Optional<Product>> findProductById(@PathVariable("id") String id) {
+        try {
+            Optional<Product> product = productService.findProductById(id);
+            if (product == null) {
+                return new ResponseEntity(
+                        "(1) No Product Found with ID: " + id,
+                        HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok().body(product);
+        } catch (Exception e) {
+            return new ResponseEntity(
+                    "(2) No Product Found with ID: " + id,
+                    HttpStatus.NOT_FOUND);
+        }
     }
 
-    @DeleteMapping ("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable ("id") String id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable("id") String id) {
+        if (findProductById(id).getBody().isEmpty()){
+            return new ResponseEntity("No product found with ID: "+ id, HttpStatus.NOT_FOUND);
+        }
         productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping ("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable ("id") String productId, @RequestBody Product product){
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable("id") String productId, @RequestBody Product product) {
         productService.update(productId, product);
         return ResponseEntity.ok(product);
     }
 
-    @PatchMapping ("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> updateProduct(@PathVariable("id") String productId,
-                                             @RequestBody ProductUpdateDTO productUpdateDTO) {
+                                              @RequestBody ProductUpdateDTO productUpdateDTO) {
         Optional<Product> productOptional = productService.findProductById(productId);
         if (productOptional.isEmpty()) {
             return ResponseEntity.notFound().build();

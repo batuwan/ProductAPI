@@ -26,8 +26,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -68,6 +70,78 @@ class ProductApplicationTests {
 
 	}
 
+	@Test
+	public void findProductById_whenProductIsNull_ShouldReturn404() throws Exception {
+		//Given
+		String productId = "mock_id";
+		//When
+		when(productService.findProductById(productId)).thenReturn(null);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+				.get("/v1/products/"+ productId)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		MockHttpServletResponse response = result.getResponse();
+		//Then
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_NOT_FOUND);
+	}
+
+	@Test
+	public void findProductById_whenEverythingIsOK_ShouldReturn200() throws Exception {
+		//Given
+		String productId = "mock_id";
+		Product product = new Product();
+		//When
+		when(productService.findProductById(productId)).thenReturn(java.util.Optional.of(product));
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+				.get("/v1/products/"+ productId)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		MockHttpServletResponse response = result.getResponse();
+		//Then
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+	}
+
+	@Test
+	public void deleteProduct_whenProductIsNotExist_ShouldReturn404() throws Exception {
+		//Given
+		String productId = "mockProduct";
+		//When
+		when(productService.findProductById(productId)).thenReturn(null);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+				.delete("/v1/products/notExistProduct")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		MockHttpServletResponse response = result.getResponse();
+		//Then
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_NOT_FOUND);
+	}
+
+	@Test
+	public void deleteProduct_whenEverythingIsOkay_ShouldReturn200() throws Exception {
+
+		//Given
+		String productId = "mockId";
+		Product product = new Product();
+		product.setId(productId);
+		//When
+		when(productService.findProductById(productId)).thenReturn(Optional.of(product));
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+				.delete("/v1/products/"+productId)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		MockHttpServletResponse response = result.getResponse();
+		//Then
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+
+	}
 
 
 
